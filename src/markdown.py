@@ -34,6 +34,69 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
 
     return new_nodes
 
+
+def split_nodes_image(old_nodes):
+    new_nodes = []
+    for node in  old_nodes:
+        # get the list of tuples that look like (alt_text, image)
+        images = extract_markdown_images(node.text)
+        if len(images) == 0:
+            new_nodes.append(node)
+            continue
+
+        node_text = node.text
+        i = 0
+
+        while len(node_text) > 0:
+            if i > len(images)-1:
+                new_nodes.append(TextNode(node_text, TextType.TEXT))
+                break # because we have text after the final image
+            sections = node_text.split(f"![{images[i][0]}]({images[i][1]})", 1)
+            if len(sections) != 2:
+                raise ValueError("invalid markdown, image section not closed")
+            if sections[0] != "":
+                new_nodes.append(TextNode(sections[0], TextType.TEXT))
+            if len(sections) > 1:
+                new_nodes.append(TextNode(images[i][0], TextType.IMAGE, images[i][1]))
+                i+=1
+            if len(sections) == 1:
+                node_text = ""
+            node_text = sections[1]
+
+    return new_nodes
+
+
+def split_nodes_link(old_nodes):
+    new_nodes = []
+    for node in  old_nodes:
+        # get the list of tuples that look like (alt_text, link)
+        links = extract_markdown_links(node.text)
+        if len(links) == 0:
+            new_nodes.append(node)
+            continue
+
+        node_text = node.text
+        i = 0
+
+        while len(node_text) > 0:
+            if i > len(links)-1:
+                new_nodes.append(TextNode(node_text, TextType.TEXT))
+                break # because we have text after the final link
+            sections = node_text.split(f"[{links[i][0]}]({links[i][1]})", 1)
+            if len(sections) != 2:
+                raise ValueError("invalid markdown, link section not closed")
+            if sections[0] != "":
+                new_nodes.append(TextNode(sections[0], TextType.TEXT))
+            if len(sections) > 1:
+                new_nodes.append(TextNode(links[i][0], TextType.LINK, links[i][1]))
+                i+=1
+            if len(sections) == 1:
+                node_text = ""
+            node_text = sections[1]
+
+    return new_nodes
+
+
 def extract_markdown_images(text):
     # returns matches for 2 groups along the string in a list of tuples
     # matches = re.findall(r"!\[(.*?)\]\((.*?)\)", text) # first regex idea
