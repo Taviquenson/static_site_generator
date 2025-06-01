@@ -1,5 +1,15 @@
 import re
+from enum import Enum
 from textnode import TextNode, TextType
+
+def text_to_textnodes(text):
+    # Use all the splitting functions one after the other
+    node = TextNode(text, TextType.TEXT)
+    nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
+    nodes = split_nodes_delimiter(nodes, "_", TextType.ITALIC)
+    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
+    nodes = split_nodes_image(nodes)
+    return split_nodes_link(nodes)
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     new_nodes = []
@@ -104,13 +114,3 @@ def extract_markdown_links(text):
 # Negative look behind specifies a group that can not match before the main expression
 # (if it matches, the result is discarded)
 # Basically, if there is a '!' before the rest of the matched pattern, the result is discarded
-
-
-def text_to_textnode(text):
-    # Use all the splitting functions one after the other
-    node = TextNode(text, TextType.TEXT)
-    nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
-    nodes = split_nodes_delimiter(nodes, "_", TextType.ITALIC)
-    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
-    nodes = split_nodes_image(nodes)
-    return split_nodes_link(nodes)
