@@ -88,20 +88,38 @@ This is **bolded** paragraph
         block_type = block_to_block_type(block)
         self.assertEqual(block_type, BlockType.PARAGRAPH)
 
-    def test_block_to_block_type_code_one_line(self):
-        block = "```This is code single line```"
+    def test_block_to_block_type_code_one(self):
+        block = '''```
+var = foo"
+```'''
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.CODE)
+
+    # Code blocks are meant to be more than one line and last line start with ```
+    def test_block_to_block_type_code_one_line_wrong(self):
+        block = "```code_block_formatted_wrong```"
+        block_type = block_to_block_type(block)
+        self.assertEqual(block_type, BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_code_multiple_lines(self):
+        block = '''```
+for line in lines:
+    result = do_something(line)
+    do_something_else(result)
+```'''
         block_type = block_to_block_type(block)
         self.assertEqual(block_type, BlockType.CODE)
     
-    def test_block_to_block_type_code_multiple_lines(self):
+    def test_block_to_block_type_code_multiple_lines_wrong_format(self):
         block = '''```for line in lines:
     result = do_something(line)
     do_something_else(result)```'''
         block_type = block_to_block_type(block)
-        self.assertEqual(block_type, BlockType.CODE)
+        self.assertEqual(block_type, BlockType.PARAGRAPH)
 
     def test_block_to_block_type_code_wrong(self):
-        block = "```This is code single line``"
+        block = '''```var = 0
+``'''
         block_type = block_to_block_type(block)
         self.assertEqual(block_type, BlockType.PARAGRAPH)
 
@@ -118,7 +136,7 @@ This is **bolded** paragraph
     def test_block_to_block_type_u_list(self):
         block = "- This is a list\n- with items"
         block_type = block_to_block_type(block)
-        self.assertEqual(block_type, BlockType.UNORDERED_LIST)
+        self.assertEqual(block_type, BlockType.ULIST)
     
     def test_block_to_block_type_u_list_wrong(self):
         block = "- This is a list\n with items"
@@ -128,7 +146,7 @@ This is **bolded** paragraph
     def test_block_to_block_type_o_list(self):
         block = "1. This is a list\n2. with items"
         block_type = block_to_block_type(block)
-        self.assertEqual(block_type, BlockType.ORDERED_LIST)
+        self.assertEqual(block_type, BlockType.OLIST)
 
     def test_block_to_block_type_o_list_wrong(self):
         block = "1. This is a list\n3. with items"
