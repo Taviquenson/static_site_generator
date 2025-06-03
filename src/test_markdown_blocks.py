@@ -153,3 +153,5 @@ for line in lines:
         block_type = block_to_block_type(block)
         self.assertEqual(block_type, BlockType.PARAGRAPH)
     
+if __name__ == "__main__":
+    unittest.main()
