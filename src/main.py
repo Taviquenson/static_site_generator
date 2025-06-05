@@ -2,7 +2,7 @@ from textnode import *
 import os, shutil
 
 from copystatic import copy_directory
-from gencontent import generate_page
+from gencontent import generate_pages_recursive
 
 
 dir_path_static = "./static"
@@ -19,11 +19,9 @@ def main():
     print("Copying static files to public directory...")
     copy_directory(dir_path_static, dir_path_public)
 
-    generate_page(
-        os.path.join(dir_path_content, "index.md"),
-        template_path,
-        os.path.join(dir_path_public, "index.html"),
-    )
+    print("Generating website...")
+    generate_pages_recursive(dir_path_content, template_path, dir_path_public)
+
 
 if __name__ == "__main__":
     main()

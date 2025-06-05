@@ -10,7 +10,7 @@ def extract_title(markdown):
             return no_hashtag_line.strip()
     raise ValueError("Mardowns must have an h1 heading.")
 
-'''  '''
+''' takes a Markdown file and generates an html of it '''
 def generate_page(from_path, template_path, dest_path):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
@@ -43,3 +43,28 @@ def generate_page(from_path, template_path, dest_path):
 
     md_file.close()
     html_template_file.close()
+
+''' takes a directory with Mardown files and generates a website from it '''
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    if not os.path.exists(dest_dir_path):
+        os.mkdir(dest_dir_path)
+        print(f"Created directory '{dest_dir_path}'")
+
+    if os.path.exists(dir_path_content):
+        file_names = os.listdir(dir_path_content)
+    else:
+        raise ValueError("Invalid directory path")
+    
+    for file_name in file_names:
+        new_dir_path_content = os.path.join(dir_path_content, file_name)
+        if os.path.isfile(new_dir_path_content):
+            print(f"Creating page '{new_dir_path_content}' in dir: {dest_dir_path}")
+            generate_page(
+                new_dir_path_content,
+                template_path,
+                os.path.join(dest_dir_path, "index.html"),
+            )
+        else: # was directory, so recurse
+            next_dest_dir_path = os.path.join(dest_dir_path, file_name)
+            # print(f"Recursing into dir: {new_dir_path_content} and Copying to dir: {next_dest_dir}")
+            generate_pages_recursive(new_dir_path_content, template_path, next_dest_dir_path)
